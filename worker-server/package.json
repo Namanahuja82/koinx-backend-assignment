@@ -1,0 +1,17 @@
+{
+  "name": "worker-server",
+  "version": "1.0.0",
+  "description": "Background worker for cryptocurrency data updates",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "nats": "^2.15.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

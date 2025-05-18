@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # NATS Message Queue
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"  # HTTP monitoring port
+    command: ["-js", "-m", "8222"]  # Enable JetStream and monitoring
+    restart: unless-stopped
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: crypto_stats
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  # API Server
+  api-server:
+    build: ./api-server
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/crypto_stats
+      - NATS_SERVER=nats://nats:4222
+      - PORT=3000
+    depends_on:
+      - mongodb
+      - nats
+    restart: unless-stopped
+
+  # Worker Server
+  worker-server:
+    build: ./worker-server
+    environment:
+      - NATS_SERVER=nats://nats:4222
+    depends_on:
+      - nats
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
